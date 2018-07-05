@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>词频小工具</title>
+  <!-- jquery -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <!-- vue -->
+  <script src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js"></script>
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+
+<body>
+  <div id="app">
+    <div class="container">
+      <h3>给许晴写的词频小工具😂</h3>
+      <form>
+        <div class="form-group">
+          <!-- 文本 -->
+          <label for="text">文本</label>
+          <textarea id="text" class="form-control" rows="10" v-model="text"></textarea>
+        </div>
+        <!-- 关键词 -->
+        <div class="form-group">
+          <label for="keyword">关键词</label>
+          <input type="text" id="keyword" class="form-control" v-model:value="keyword">
+        </div>
+        <button class="btn btn-success" type="button" name="button" @click="test()">查找</button>
+      </form>
+    </div>
+    <div class="container" style="padding-top: 10px;">
+      <div class="well" style="margin-bottom: 5px;">
+        <strong>{{ keyword }}</strong>
+        <span>出现的总次数：</span>
+        <strong>{{ totalTimes }}</strong>
+      </div>
+      <table class="table table-hover">
+        <thead>
+          <th style="width: 20px;">#</th>
+          <th style="width: 50px;">次数</th>
+          <th>原句</th>
+        </thead>
+        <tbody>
+          <tr v-for="(result, index) in results">
+            <td>{{ index + 1 }}</td>
+            <td>{{ result.times }}</td>
+            <td v-html="result.origin"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        text: '',
+        keyword: '',
+        results: [],
+        totalTimes: 0,
+      },
+      methods: {
+        test: function() {
+          const self = this
+          // 重置数据
+          self.results = []
+          self.totalTimes = 0
+          // 业务逻辑
+          let regExp = new RegExp(self.keyword, 'g')
+          self.text.split('.').forEach(function(item) {
+            if (item.trim().search(regExp) != -1) {
+              let times = item.trim().match(regExp).length
+              item = item.replace(regExp, '<code>' + self.keyword + '</code>')
+              self.results.push({
+                times: times,
+                origin: item + '.',
+              })
+              self.totalTimes += times
+            }
+          })
+        },
+      },
+      mounted: function() {
+        const self = this
+        self.text =
+          'В эти минуты, вступая в должность Президента России, особенно остро осознаю свою колоссальную ответственность перед каждым из вас, перед всем нашим многонациональным народом, ответственность перед Россией – страной грандиозных побед и свершений, перед тысячелетней историей российской государственности и нашими предками. Их мужество, неустанный труд, непобедимое единство, священное отношение к родной земле – вечный пример преданности Отчизне.'
+        self.keyword = 'перед'
+      },
+    })
+  </script>
+</body>
+
+</html>
